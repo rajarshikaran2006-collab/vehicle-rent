@@ -1,0 +1,38 @@
+# Render Blueprint — one public URL serving the React site and the Flask API.
+# Push this repo to GitHub, then in Render: New + > Blueprint > pick the repo.
+services:
+  - type: web
+    name: roam-rental
+    runtime: docker
+    plan: free
+    region: singapore # closest Render region to India; use frankfurt/oregon if you prefer
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      # Public demo configuration. Read the security notes in README.md before sharing.
+      - key: APP_ENV
+        value: development
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SEED_DEMO
+        value: "1"
+      - key: PAYMENT_MODE
+        value: mock
+      - key: SHOW_RESET_LINK
+        value: "0"
+      - key: RENTAL_TIMEZONE
+        value: Asia/Kolkata
+    # The free plan has an ephemeral filesystem: the SQLite demo database is recreated
+    # and reseeded on every deploy/restart. To keep bookings and uploads, move to a paid
+    # plan, attach a disk, and point the app at it:
+    #
+    # disk:
+    #   name: roam-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    #
+    # envVars:  (add to the list above)
+    #   - key: DATABASE_URL
+    #     value: sqlite:////var/data/roam.db
+    #   - key: UPLOAD_DIR
+    #     value: /var/data/uploads
